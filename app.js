@@ -23,7 +23,13 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require('mongoose');
 var $ = require('jquery');
-
+const session = require('express-session');
+const passport = require('passport');
+const LocalStrategy = require('passport-local').Strategy;
+const passportLocalMongoose = require('passport-local-mongoose');
+const request = require("request");
+const obj = require(__dirname + '/obj');
+//console.log(obj);
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -31,8 +37,34 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 app.use(express.static("public"));
+app.use(session({
+  secret : "this is something",
+  resave : false,
+  saveUninitialized : false
+}));
 
-var request = require("request");
+app.use(passport.initialize());
+app.use(passport.session());
+
+mongoose.connect("mongodb://localhost:27017/imdbDB",{ useUnifiedTopology: true, useNewUrlParser: true} );
+mongoose.set('useFindAndModify', false);
+mongoose.set('useCreateIndex',true);
+
+const Comment = require(__dirname + '/schema/comment');
+const User = require(__dirname + '/schema/user');
+
+//Using passportJS for authentication creating Strategy and OAuth
+//Here local Strategy is created using passport-local-mongoose package
+passport.use(User.createStrategy());
+passport.serializeUser(function(user, done) {
+  done(null, user.id);
+});
+passport.deserializeUser(function(id, done) {
+  User.findById(id, function(err, user) {
+    done(err, user);
+  });
+});
+
 
 var options = {
   method: 'GET',
@@ -96,6 +128,193 @@ app.get("/search", function(req, res) {
     });
   }
 });
+
+app.get("/show/:id",function(req,res){
+
+  //res.render('show',obj);
+  //there are nested requests 1)for overall show 2)crew of show 3)user reviews
+  // REQUEST FOR OVERVIEW
+  var options = {
+    method: 'GET',
+    url: 'https://imdb8.p.rapidapi.com/title/get-overview-details',
+    qs: {currentCountry: 'US', tconst: req.params.id},
+    headers: {
+      'x-rapidapi-host': 'imdb8.p.rapidapi.com',
+      'x-rapidapi-key': '266ef19794msha90348685a1c992p155c55jsn7040d1b68eb5', //use own key
+      useQueryString: true
+    }
+  };
+
+  request(options, function (error, response, showX) {
+  	if (error){
+       throw new Error(error);
+    }
+
+    const show = JSON.parse(showX);
+    //console.log(typeof(show));
+    //console.log(show);
+    const title = show.title.title;
+    let url = "Some constant failsafe url";
+    if(show.title.image){
+      if(show.title.image.url){
+        url = show.title.image.url
+      }
+    }
+    const genres = show.genres;
+    const titleType = show.title.titleType;
+    const year = show.title.year;
+    let synopsis = "Synopsis not added";
+    let rating = "Not Rated";
+    let summary = "Summary not added";
+    if(show.plotOutline){
+      synopsis = show.plotOutline.text;
+    }
+    if(show.ratings.canRate){
+      rating = show.ratings.rating;
+    }
+    if(show.plotSummary){
+      summary = show.plotSummary.text;;
+    }
+    //console.log(title,url,genres,titleType,year,synopsis,rating,summary);
+
+    //REQUEST FOR CREW
+    var crewGet = {
+    method: 'GET',
+    url: 'https://imdb8.p.rapidapi.com/title/get-top-crew',
+    qs: {tconst: req.params.id},
+    headers: {
+      'x-rapidapi-host': 'imdb8.p.rapidapi.com',
+      'x-rapidapi-key': '266ef19794msha90348685a1c992p155c55jsn7040d1b68eb5',
+      useQueryString: true
+    }
+  };
+
+  request(crewGet, function (error, response, crewX) {
+  	if (error) throw new Error(error);
+
+    const crew = JSON.parse(crewX);
+    let directors = "DDD" ;
+    let writers = [];
+  	if(titleType == "movie"){
+      directors = crew.directors;
+      writers = crew.writers;
+    }
+    else if(titleType == "tvSeries"){
+      const writersMain = crew.writers;
+
+      writersMain.forEach(function(writerx){
+        if(writerx.job == "creator"){
+          writers.push(writerx);
+        }
+      });
+    }
+
+    //REQUEST for REVIEWS
+    var rev = {
+      method: 'GET',
+      url: 'https://imdb8.p.rapidapi.com/title/get-user-reviews',
+      qs: {tconst: req.params.id},
+      headers: {
+        'x-rapidapi-host': 'imdb8.p.rapidapi.com',
+        'x-rapidapi-key': '266ef19794msha90348685a1c992p155c55jsn7040d1b68eb5',
+        useQueryString: true
+      }
+    };
+
+    request(rev, function (error, response, revs) {
+    	if (error) throw new Error(error);
+
+      const reviewsX = JSON.parse(revs);
+      const reviews = reviewsX.reviews;
+      //console.log(reviewsX);
+
+      Comment.find({titleId : req.params.id},function(err,comments){
+        if(!err){
+          res.render('show',{
+            title : title,
+            titleId : req.params.id,
+            url : url,
+            genres : genres,
+            titleType : titleType,
+            year : year,
+            synopsis : synopsis,
+            rating : rating,
+            summary : summary,
+            writers : writers,
+            directors : directors,
+            reviews : reviews,
+            comments : comments
+          });
+        }
+      })
+    	//console.log(revs);
+    });
+  });
+  });
+});
+
+app.post('/comment',function(req,res){
+  if(req.isAuthenticated()){
+
+    const d = new Date();
+    const date = d.toLocaleDateString("en-US",{month: "short",  day: "numeric"});
+
+    const comment = new Comment({
+      titleId : req.body.titleId,
+      username : req.user.username,
+      date : date,
+      body : req.body.body,
+      upvotes : 0,
+      downvotes : 0
+    })
+    comment.save(function(err){
+      if(err){
+        alert("Oops ! Could not post commnet. Please try again.")
+      }else{
+        res.redirect('/show/'+req.body.titleId);
+      }
+    });
+
+  }else{
+    res.send("Please SignIn First !");
+  }
+});
+
+app.post('/register',function(req,res){
+  //registering user using passport-local-mongoose using LocalStrategy
+  User.register({username : req.body.username},req.body.password,function(err,user){
+    if(err){
+      console.log(err);
+      res.redirect('/signin');
+    }
+    else{
+      passport.authenticate("local")(req,res,function(){
+        res.redirect('/');
+      })
+    }
+  });
+});
+
+app.post('/login',function(req,res){
+
+  const user = new User({
+    username : req.body.username,
+    password : req.body.password
+  });
+  //Logging in user using LocalStrategy by using passport-local-mongoose
+  req.login(user,function(err){
+    if(err){
+      console.log(err);
+    }
+    else{
+      passport.authenticate("local")(req,res,function(){
+        res.redirect('/');
+      });
+    }
+  });
+});
+
+
 //searching Movies
 app.post("/search", function(req, res) {
 
