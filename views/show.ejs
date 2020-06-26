@@ -1,4 +1,6 @@
-<%- include("header.ejs") -%>
+<%-include("header.ejs")-%>
+
+
   <!-- <link rel="stylesheet" href="css/show.css"> -->
     <div class="container">
 
@@ -107,11 +109,15 @@
     <%}%>
 
 
+
     <h3>comments</h3>
     <% var i = -1%>
+
+    <ul id= "comments-section">
+
     <%comments.forEach(function(comment){%>
       <%i++%>
-      <div class="comment-section">
+      <li class="comment-section">
 
         <div >
           <img class="display-pic" src="https://api.adorable.io/avatars/285/<%=comment.username%>.png" alt="" height="60" width="60">
@@ -129,17 +135,42 @@
               $("#c<%=i%>").hide();
             })
           </script>
-          <!-- <button type="button" name="upvote">upvote</button>
-          <button type="button" name="downvote">downvote</button> -->
+          <button type="button" id = "<%=comment._id%>" name="upvote">upvote</button>
+          <button type="button" id = "<%=comment._id%>" name="downvote">downvote</button>
         </div>
 
-      </div>
+      </li>
     <%});%>
 
-    <form class="" action="/comment" method="post">
-      
+
+    </ul>
+    <script>
+        $(function () {
+        var socket = io();
+        $('.comment-send').submit(function(e) {
+          e.preventDefault(); // prevents page reloading
+          socket.emit('new comment',{titleId :"<%=titleId%>",body : $('#commentBody').val(),username :"<%=username%>",auth :"<%=auth%>"});
+          $('#commentBody').val('');
+        })
+
+        socket.on("comment added",function(newComment){
+          $("#comments-section").append($('<li class="comment-section">').html('<div ><img class="display-pic" src="https://api.adorable.io/avatars/285/newComment.username.png" alt="" height="60" width="60"></div><div class=""><strong>' + newComment.username + '</strong> <i>' + newComment.date + '</i><p>'+ newComment.body +'</p><button type="button" name="upvote">upvote</button><button type="button" name="downvote">downvote</button></div>'))
+        })
+        socket.on("comment failed",function(){
+          $("#comments-section").append('nooooooo');
+        })
+
+        // upvote and downvote
+        $('[name = "area"]').click(function(){
+
+        })
+      });
+
+    </script>
+    <form class="comment-send" action="" >
+
       <input type="hidden" name="titleId" value= "<%=titleId%>">
-      <input type="text" name="body" placeholder="Join the Discussion">
+      <input id = "commentBody" type="text" name="body" placeholder="Join the Discussion">
       <button type="submit" name="button">Submit</button>
     </form>
     </div>

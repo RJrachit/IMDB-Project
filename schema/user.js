@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema({
   wishList : [{
     titleId : String,
     title : String,
+    rating : Number,
     url : String,
     synopsis : String,
   }]

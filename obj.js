@@ -1,5 +1,7 @@
 module.exports = {
   title: 'Chhichhore',
+  username : 'undefined',
+  auth : 'false',
   titleId: 'tt9052870',
   url: 'https://m.media-amazon.com/images/M/MV5BYjg2ZDI2YTYtN2EwYi00YWI5LTgyMWQtMWFkYmE3NmJkOGVhXkEyXkFqcGdeQXVyODE5NzE3OTE@._V1_.jpg',
   genres: [ 'Comedy', 'Drama' ],
