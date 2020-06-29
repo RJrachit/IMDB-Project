@@ -41,28 +41,9 @@
         </div>
     </div>
     <p><%= synopsis%></p>
-    <%if(titleType == 'movie'){%>
-      <% var first = true%>
-      <p>Director :
-        <%directors.forEach(function(director){%>
-          <%if(!first){%>
-            ,
-          <%}%>
-          <%=director.name%>
-          <% var first = false%>
-        <%});%>
-      </p>
-      <% first = true%>
-      <p>Writers :
-        <%writers.forEach(function(writer){%>
-          <%if(!first){%>
-            ,
-          <%}%>
-          <%=writer.name%>
-          <% first = false%>
-        <%});%>
-      </p>
-    <%}else if(titleType == 'tvSeries'){%>
+
+    <%if(titleType == 'tvSeries'){%>
+
       <% var first = true%>
       <p>Creators :
         <%writers.forEach(function(writer){%>
@@ -73,10 +54,45 @@
           <% first = false%>
         <%});%>
       </p>
+
+
+
+
+
+    <%}else{%>
+
+
+    <% var first = true%>
+    <p>Director :
+      <%directors.forEach(function(director){%>
+        <%if(!first){%>
+          ,
+        <%}%>
+        <%=director.name%>
+        <% var first = false%>
+      <%});%>
+    </p>
+    <% first = true%>
+    <p>Writers :
+      <%writers.forEach(function(writer){%>
+        <%if(!first){%>
+          ,
+        <%}%>
+        <%=writer.name%>
+        <% first = false%>
+      <%});%>
+    </p>
+
     <%}%>
 
+    <!-- watchlist button -->
     <form class="" action="/updateWatchlist" method="post">
-      <button type="submit" name="button">Add to watchlist +</button>
+      <input type="text" name="titleId" value="<%=titleId%>" style="display:none;">
+      <input type="text" name="title" value="<%=title%>" style="display:none;">
+      <input type="number" name="rating" value="<%=rating%>" style="display:none;">
+      <input type="text" name="url" value="<%=url%>" style="display:none;">
+      <input type="text" name="synopsis" value="<%=synopsis%>" style="display:none;">
+      <button type="submit" name="button" class="btn btn-primary"><b>+ </b>Add to watchlist</button>
     </form>
 
     <h2>Summary</h2>
@@ -146,6 +162,12 @@
             <button type="submit" class="upvote" name="<%=comment._id%>" value="notLiked">upvote</button> <!--if user doesnt exist-->
           <%}%>
 
+          <%if(comment.username == username){%>
+            <form class="delete" action="/deleteComment" method="post">
+              <button type="submit" name="delete" value="<%=comment._id%>">delete</button>
+            </form>
+          <%}%>
+
         </div>
 
       </li>
@@ -197,7 +219,7 @@
         })
 
         socket.on("comment added",function(newComment){ //after the comment is added we need to render it also
-          $("#comments-section").append($('<li class="comment-section">').html('<div ><img class="display-pic" src="https://api.adorable.io/avatars/285/newComment.username.png" alt="" height="60" width="60"></div><div class=""><strong>' + newComment.username + '</strong> <i>' + newComment.date + '</i><p>'+ newComment.body +'</p><button type="submit" class="upvote" name='+newComment._id+' value="liked">upvote</button>'))
+          $("#comments-section").append($('<li class="comment-section">').html('<div ><img class="display-pic" src="https://api.adorable.io/avatars/285/newComment.username.png" alt="" height="60" width="60"></div><div class=""><strong>' + newComment.username + '</strong> <i>' + newComment.date + '</i><p>'+ newComment.body +'</p><button type="submit" class="upvote" name='+newComment._id+' value="notLiked">upvote</button><form class="delete" action="/deleteComment" method="post"><button type="submit" name="delete" value='+newComment._id+'>delete</button></form>'))
         })
         socket.on("comment failed",function(){//in case the comment is not updated or the user is not loggeg in or authorised
           $("#comments-section").append('nooooooo');

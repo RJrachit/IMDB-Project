@@ -1,2 +1,21 @@
 <%- include("header.ejs") -%>
+
+<h1>profile image</h1>
+<img src="https://api.adorable.io/avatars/285/<%=user.username%>.png" alt="" width="100px" height="100px">
+<h3>User name: <%=user.username%></h3>
+
+<h1>change first and last name</h1>
+<form class="" action="/changeSettings" method="post">
+  <input type="text" name="firstName" value="<%=user.firstName%>">
+  <input type="text" name="lastName" value="<%=user.lastName%>">
+  <button type="submit" name="button">change</button>
+</form>
+
+<h1>change password</h1>
+<form class="" action="/changePassword" method="post">
+  <input type="password" name="newPass" placeholder="new password">
+  <input type="password" name="confirmed" placeholder="confirm password">
+  <button type="submit" name="button">change password</button>
+</form>
+<a href="/seewatchlist" class="btn btn-primary">See Your Watchlist!</a>
 <%- include("footer.ejs") -%>
