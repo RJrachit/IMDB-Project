@@ -42,6 +42,7 @@ const request = require("request");
 const obj = require(__dirname + '/obj');
 var server = require('http').createServer(app);
 var io = require('socket.io')(server);
+var jsalert = require('js-alert');
 //console.log(obj);
 app.set('view engine', 'ejs');
 
@@ -87,9 +88,14 @@ passport.use(new GoogleStrategy({
     callbackURL: "http://localhost:3000/auth/google/imdb-project",
     userProfileURL: 'https://www.googleapis.com/oauth2/v3/userinfo'
   },
-  function(req,accessToken, refreshToken, profile, cb) {
+  function(req, accessToken, refreshToken, profile, cb) {
     console.log(profile);
-    User.findOrCreate({ googleId: profile.id,username : profile.displayName,firstName :profile.name.givenName,lastName:profile.name.familyName}, function (err, user) {
+    User.findOrCreate({
+      googleId: profile.id,
+      username: profile.displayName,
+      firstName: profile.name.givenName,
+      lastName: profile.name.familyName
+    }, function(err, user) {
       return cb(err, user);
     });
   }
@@ -101,19 +107,22 @@ passport.use(new FacebookStrategy({
   },
   function(accessToken, refreshToken, profile, cb) {
     console.log(profile);
-    User.findOrCreate({ facebookId: profile.id ,username:profile.displayName}, function (err, user) {
+    User.findOrCreate({
+      facebookId: profile.id,
+      username: profile.displayName
+    }, function(err, user) {
       return cb(err, user);
     });
   }
 ));
 
 
-const autherisationFunc = function(req,res,next){
+const autherisationFunc = function(req, res, next) {
   req.authCustom = {};
-  if(req.isAuthenticated()){
+  if (req.isAuthenticated()) {
     req.authCustom.auth = true;
     req.authCustom.username = req.user.username;
-  }else{
+  } else {
     req.authCustom.auth = false;
     req.authCustom.username = undefined;
   }
@@ -136,17 +145,23 @@ request(options, function(error, response, body) {
 app.get('/auth/facebook',
   passport.authenticate('facebook'));
 app.get('/auth/google',
-  passport.authenticate('google', { scope: ['profile'] }));
+  passport.authenticate('google', {
+    scope: ['profile']
+  }));
 
 app.get('/auth/google/imdb-project',
-  passport.authenticate('google', { failureRedirect: '/login' }),
+  passport.authenticate('google', {
+    failureRedirect: '/login'
+  }),
   function(req, res) {
     // Successful authentication, redirect home.
     res.redirect('/');
-});
+  });
 
 app.get('/auth/facebook/imdb-project',
-  passport.authenticate('facebook', { failureRedirect: '/login' }),
+  passport.authenticate('facebook', {
+    failureRedirect: '/login'
+  }),
   function(req, res) {
     // Successful authentication, redirect home.
     res.redirect('/');
@@ -156,11 +171,6 @@ app.get("/", function(req, res) {
   // res.send("hattbc");
   console.log(req.authCustom.username);
   console.log(req.authCustom.auth);
-  if(req.isAuthenticated()){
-    console.log("kkkkkkkkkk");
-    req.user.firstNam = "afasdgf";
-    req.user.save();
-  }
   //console.log(req.user);
   res.render("home", {
     username: req.authCustom.username,
@@ -169,20 +179,20 @@ app.get("/", function(req, res) {
 });
 
 app.get("/signin", function(req, res) {
-  res.render("signin",{
+  res.render("signin", {
     username: req.authCustom.username,
     auth: req.authCustom.auth
   });
 });
 
-app.get("/signup",function(req,res){
-  res.render("signup",{
+app.get("/signup", function(req, res) {
+  res.render("signup", {
     username: req.authCustom.username,
     auth: req.authCustom.auth
   });
 });
 
-app.get('/logout',function(req,res){
+app.get('/logout', function(req, res) {
   req.logout();
   res.redirect('/');
 });
@@ -190,9 +200,7 @@ app.get('/logout',function(req,res){
 var movieName = "";
 app.get('/search', function(req, res) {
   if (movieName.length === 0) {
-    res.write("<h1>Looks like you haven't searched for anything.</h1>");
-    res.write("<p>Go back to search for a movie/show</p>");
-    res.send();
+    res.render("emptysearch",{auth: req.authCustom.auth});
   } else {
     var findTitle = {
       method: 'GET',
@@ -210,7 +218,9 @@ app.get('/search', function(req, res) {
     movieName = "";
     //Now I have to send these results to search.ejs
     request(findTitle, function(error, response, body) {
-      if (error) {console.log("dasfasfafsadgasgdasdg");};
+      if (error) {
+        console.log("dasfasfafsadgasgdasdg");
+      };
       const jsObj = JSON.parse(body);
 
       console.log(jsObj);
@@ -228,8 +238,8 @@ app.get("/profile", function(req, res) {
     console.log(req.user);
     res.render("profile", {
       username: req.authCustom.username,
-      auth : req.authCustom.auth,
-      user : req.user
+      auth: req.authCustom.auth,
+      user: req.user
     });
   } else {
     res.send("<h2>You need to log in to your account first</h2>")
@@ -252,14 +262,14 @@ app.get("/seewatchlist", function(req, res) {
       });
     }
   } else {
-    res.send("<h1>Please login to see your watch list!</h1>");
+    res.redirect("/signin");
   }
 });
 
 app.get("/show/:id", function(req, res) {
   //console.log(req.url);
 
-  // res.render('show',obj);
+  res.render('show',obj);
   //there are nested requests 1)for overall show 2)crew of show 3)user reviews
   //REQUEST FOR OVERVIEW
   var options = {
@@ -276,142 +286,145 @@ app.get("/show/:id", function(req, res) {
     }
   };
 
-  request(options, function(error, response, showX) {
-    if (error) {
-      throw new Error(error);
-    }
-
-    try{
-      const show = JSON.parse(showX);
-      //console.log(typeof(show));
-      //console.log(show);
-      const title = show.title.title;
-      let url = "Some constant failsafe url";
-      if (show.title.image) {
-        if (show.title.image.url) {
-          url = show.title.image.url
-        }
-      }
-      const genres = show.genres;
-      const titleType = show.title.titleType;
-      const year = show.title.year;
-      let synopsis = "Synopsis not added";
-      let rating = "Not Rated";
-      let summary = "Summary not added";
-      if (show.plotOutline) {
-        synopsis = show.plotOutline.text;
-      }
-      if (show.ratings.rating) {
-        rating = show.ratings.rating;
-      }
-      if (show.plotSummary) {
-        summary = show.plotSummary.text;;
-      }
-      //console.log(title,url,genres,titleType,year,synopsis,rating,summary);
-
-      //REQUEST FOR CREW
-      var crewGet = {
-        method: 'GET',
-        url: 'https://imdb8.p.rapidapi.com/title/get-top-crew',
-        qs: {
-          tconst: req.params.id
-        },
-        headers: {
-          'x-rapidapi-host': 'imdb8.p.rapidapi.com',
-          'x-rapidapi-key': key3,
-          useQueryString: true
-        }
-      };
-
-      request(crewGet, function(error, response, crewX) {
-        if (error) throw new Error(error);
-
-        try{
-          const crew = JSON.parse(crewX);
-          //console.log(crew);
-          let directors = "DDD";
-          let writers = [];
-          if (titleType == "movie") {
-            directors = crew.directors;
-            writers = crew.writers;
-          } else if (titleType == "tvSeries") {
-            const writersMain = crew.writers;
-            writersMain.forEach(function(writerx) {
-              if (writerx.job == "creator") {
-                writers.push(writerx);
-              }
-            });
-          }else{
-            directors = crew.directors;
-            writers = crew.writers;
-          }
-          //console.log(directors,writers);
-
-          //REQUEST for REVIEWS
-          var rev = {
-            method: 'GET',
-            url: 'https://imdb8.p.rapidapi.com/title/get-user-reviews',
-            qs: {
-              tconst: req.params.id
-            },
-            headers: {
-              'x-rapidapi-host': 'imdb8.p.rapidapi.com',
-              'x-rapidapi-key': key3,
-              useQueryString: true
-            }
-          };
-
-          request(rev, function(error, response, revs) {
-            if (error) throw new Error(error);
-
-            try{
-              const reviewsX = JSON.parse(revs);
-              const reviews = reviewsX.reviews;
-              //console.log(reviewsX);
-
-              Comment.find({titleId: req.params.id}, function(err, comments) {
-                if (!err) {
-                  const finalObject = {
-                    title: title,
-                    titleId: req.params.id,
-                    url: url,
-                    genres: genres,
-                    titleType: titleType,
-                    year: year,
-                    synopsis: synopsis,
-                    rating: rating,
-                    summary: summary,
-                    writers: writers,
-                    directors: directors,
-                    reviews: reviews,
-                    comments: comments,
-                    username: req.authCustom.username, //current username of logged in account
-                    auth: req.authCustom.auth
-                  };
-                  console.log(finalObject);
-                  res.render('show',finalObject );
-                }
-              })
-              //console.log(revs);
-            }catch(reviewserr){
-              console.log("review error !");
-              console.log(reviewserr);
-            }
-
-          });
-        }catch(directorserr){
-          console.log("directors error !");
-          console.log(directorserr);
-        }
-
-      });
-    }catch(showerr){
-      console.log("show error !");
-      console.log(showerr);
-    }
-
-
-  });
+  // request(options, function(error, response, showX) {
+  //   if (error) {
+  //     throw new Error(error);
+  //   }
+  //
+  //   try {
+  //     const show = JSON.parse(showX);
+  //     //console.log(typeof(show));
+  //     //console.log(show);
+  //     const title = show.title.title;
+  //     let url = "Some constant failsafe url";
+  //     if (show.title.image) {
+  //       if (show.title.image.url) {
+  //         url = show.title.image.url
+  //       }
+  //     }
+  //     const genres = show.genres;
+  //     const titleType = show.title.titleType;
+  //     const year = show.title.year;
+  //     let synopsis = "Synopsis not added";
+  //     let rating = "Not Rated";
+  //     let summary = "Summary not added";
+  //     if (show.plotOutline) {
+  //       synopsis = show.plotOutline.text;
+  //     }
+  //     if (show.ratings.rating) {
+  //       rating = show.ratings.rating;
+  //     }
+  //     if (show.plotSummary) {
+  //       summary = show.plotSummary.text;;
+  //     }
+  //     //console.log(title,url,genres,titleType,year,synopsis,rating,summary);
+  //
+  //     //REQUEST FOR CREW
+  //     var crewGet = {
+  //       method: 'GET',
+  //       url: 'https://imdb8.p.rapidapi.com/title/get-top-crew',
+  //       qs: {
+  //         tconst: req.params.id
+  //       },
+  //       headers: {
+  //         'x-rapidapi-host': 'imdb8.p.rapidapi.com',
+  //         'x-rapidapi-key': key3,
+  //         useQueryString: true
+  //       }
+  //     };
+  //
+  //     request(crewGet, function(error, response, crewX) {
+  //       if (error) throw new Error(error);
+  //
+  //       try {
+  //         const crew = JSON.parse(crewX);
+  //         //console.log(crew);
+  //         let directors = "DDD";
+  //         let writers = [];
+  //         if (titleType == "movie") {
+  //           directors = crew.directors;
+  //           writers = crew.writers;
+  //         } else if (titleType == "tvSeries") {
+  //           const writersMain = crew.writers;
+  //           writersMain.forEach(function(writerx) {
+  //             if (writerx.job == "creator") {
+  //               writers.push(writerx);
+  //             }
+  //           });
+  //         } else {
+  //           directors = crew.directors;
+  //           writers = crew.writers;
+  //         }
+  //         //console.log(directors,writers);
+  //
+  //         //REQUEST for REVIEWS
+  //         var rev = {
+  //           method: 'GET',
+  //           url: 'https://imdb8.p.rapidapi.com/title/get-user-reviews',
+  //           qs: {
+  //             tconst: req.params.id
+  //           },
+  //           headers: {
+  //             'x-rapidapi-host': 'imdb8.p.rapidapi.com',
+  //             'x-rapidapi-key': key3,
+  //             useQueryString: true
+  //           }
+  //         };
+  //
+  //         request(rev, function(error, response, revs) {
+  //           if (error) throw new Error(error);
+  //
+  //           try {
+  //             const reviewsX = JSON.parse(revs);
+  //             const reviews = reviewsX.reviews;
+  //             //console.log(reviewsX);
+  //
+  //             Comment.find({
+  //               titleId: req.params.id
+  //             }, function(err, comments) {
+  //               if (!err) {
+  //                 const finalObject = {
+  //                   title: title,
+  //                   titleId: req.params.id,
+  //                   url: url,
+  //                   genres: genres,
+  //                   titleType: titleType,
+  //                   year: year,
+  //                   synopsis: synopsis,
+  //                   rating: rating,
+  //                   summary: summary,
+  //                   writers: writers,
+  //                   directors: directors,
+  //                   reviews: reviews,
+  //                   comments: comments,
+  //                   username: req.authCustom.username, //current username of logged in account
+  //                   auth: req.authCustom.auth
+  //                 };
+  //                 // console.log(finalObject);
+  //                 // res.json(finalObject);
+  //                 res.render('show',finalObject);
+  //               }
+  //             })
+  //             //console.log(revs);
+  //           } catch (reviewserr) {
+  //             console.log("review error !");
+  //             console.log(reviewserr);
+  //           }
+  //
+  //         });
+  //       } catch (directorserr) {
+  //         console.log("directors error !");
+  //         console.log(directorserr);
+  //       }
+  //
+  //     });
+  //   } catch (showerr) {
+  //     console.log("show error !");
+  //     console.log(showerr);
+  //   }
+  //
+  //
+  // });
 });
 
 app.post("/updateWatchlist", function(req, res) {
@@ -444,43 +457,48 @@ app.post("/updateWatchlist", function(req, res) {
 });
 
 app.post('/deleteComment', function(req, res) {
-    if(req.isAuthenticated()){
-      const commentId = req.body.delete;
-      Comment.deleteOne({username : req.user.username,_id:commentId},function(err,response){
-        res.redirect('/');
-      })
-    }
-});
-
-app.post('/changeSettings',function(req,res){
-
-if(req.isAuthenticated()){
-  User.findById(req.user._id).then(function(sanitizedUser){
-    if (sanitizedUser){
-      sanitizedUser.firstName = req.body.firstName;
-      sanitizedUser.lastName = req.body.lastName;
-      sanitizedUser.save();
-      res.redirect('/profile');
-      } else {
-        res.status(500).json({message: 'This user does not exist'});
+  if (req.isAuthenticated()) {
+    const commentId = req.body.delete;
+    Comment.deleteOne({
+      username: req.user.username,
+      _id: commentId
+    }, function(err, response) {
+      res.redirect('back');
+    })
   }
-},function(err){
-    console.error(err);
-});
-}
-
 });
 
-app.post("/changePassword",function(req,res){
-  if(req.isAuthenticated()){
-    if(req.body.newPass != req.body.confirmed){
-      res.send("password dont match");
-    }else{
-      req.user.setPassword(req.body.confirmed, function(){
-          req.user.save();
-          // res.status(200).json({message: 'password reset successful'});
-          res.redirect("/profile");
+app.post('/changeSettings', function(req, res) {
+
+  if (req.isAuthenticated()) {
+    User.findById(req.user._id).then(function(sanitizedUser) {
+      if (sanitizedUser) {
+        sanitizedUser.firstName = req.body.firstName;
+        sanitizedUser.lastName = req.body.lastName;
+        sanitizedUser.save();
+        res.redirect('/profile');
+      } else {
+        res.status(500).json({
+          message: 'This user does not exist'
         });
+      }
+    }, function(err) {
+      console.error(err);
+    });
+  }
+
+});
+
+app.post("/changePassword", function(req, res) {
+  if (req.isAuthenticated()) {
+    if (req.body.newPass != req.body.confirmed) {
+      res.send("password dont match");
+    } else {
+      req.user.setPassword(req.body.confirmed, function() {
+        req.user.save();
+        // res.status(200).json({message: 'password reset successful'});
+        res.redirect("/profile");
+      });
     }
   }
 })
@@ -489,7 +507,7 @@ app.post('/register', function(req, res) {
   User.register({
     username: req.body.username,
     firstName: req.body.firstName,
-    lastName:req.body.lastName
+    lastName: req.body.lastName
   }, req.body.password, function(err, user) {
     if (err) {
       console.log(err);
@@ -507,7 +525,7 @@ app.post('/login', function(req, res) {
   const user = new User({
     username: req.body.username,
     password: req.body.password,
-    method:"local"
+    method: "local"
   });
   //Logging in user using LocalStrategy by using passport-local-mongoose
   req.login(user, function(err) {
@@ -522,20 +540,20 @@ app.post('/login', function(req, res) {
   });
 });
 //removing from watch list
-app.post("/remove",function(req,res){
-  if(req.user){
+app.post("/remove", function(req, res) {
+  if (req.user) {
     //search the wishlist of the user
-    let indx=-1;
-    for(var i=0; i<req.user.wishList.length; i++){
-      if(req.user.wishList[i].titleId == req.body.id){
-        indx=i;
+    let indx = -1;
+    for (var i = 0; i < req.user.wishList.length; i++) {
+      if (req.user.wishList[i].titleId == req.body.id) {
+        indx = i;
         break;
       }
     }
-    req.user.wishList.splice(indx,1);
+    req.user.wishList.splice(indx, 1);
     req.user.save();
     res.redirect("/seewatchlist");
-  }else {
+  } else {
     res.send("<h2>You need to log in first!</h2>")
   }
 });

@@ -1,0 +1,26 @@
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Work Sans', sans-serif;
+}
+
+body {
+  background: #06000f !important;
+  color: #ffcd3c !important;
+}
+
+nav {
+  position: fixed;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+input:focus {
+  border-color: #ffcd3c;
+  border-width: 3px;
+}
+
+a {
+  color: #ffcd3c !important;
+  font-size: 1em;
+}
