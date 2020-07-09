@@ -24,3 +24,14 @@ a {
   color: #ffcd3c !important;
   font-size: 1em;
 }
+ #hindi{
+   /* font-family: 'Caveat', cursive; */
+   font-family: 'Kalam', cursive;
+/* font-family: 'Monoton', cursive; */
+ }
+#hollywood{
+  font-family: 'Caveat', cursive;
+font-family: 'Khula', sans-serif;
+font-family: 'Monoton', cursive;
+font-family: 'MuseoModerno', cursive;
+}

@@ -200,7 +200,15 @@ app.get('/logout', function(req, res) {
 var movieName = "";
 app.get('/search', function(req, res) {
   if (movieName.length === 0) {
-    res.render("emptysearch",{auth: req.authCustom.auth});
+    const h = "Looks like you haven't searched for anything!";
+    const pm = "Search for a movie/show in the search box provided above.";
+    res.render("respond", {
+      h: h,
+      pm: pm,
+      auth: req.authCustom.auth,
+      user: req.user,
+      username: req.authCustom.username
+    });
   } else {
     var findTitle = {
       method: 'GET',
@@ -266,10 +274,17 @@ app.get("/seewatchlist", function(req, res) {
   }
 });
 
+app.get("/developers", function(req, res) {
+  res.render("developers", {
+    username: req.authCustom.username,
+    auth: req.authCustom.auth
+  })
+});
+
 app.get("/show/:id", function(req, res) {
   //console.log(req.url);
 
-  res.render('show',obj);
+  res.render('show', obj);
   //there are nested requests 1)for overall show 2)crew of show 3)user reviews
   //REQUEST FOR OVERVIEW
   var options = {
@@ -434,7 +449,15 @@ app.post("/updateWatchlist", function(req, res) {
     for (var i = 0; i < req.user.wishList.length; i++) {
       if (req.user.wishList[i].titleId == req.body.titleId) {
         present = true;
-        res.send("<h1>This movie is already present in your Watch list</h1>")
+        const h = "This movie is already present in your Watch list";
+        const pm = "Search for other movies with the help of search box provided above";
+        res.render("respond", {
+          h: h,
+          pm: pm,
+          auth: req.authCustom.auth,
+          user: req.user,
+          username: req.authCustom.username
+        });
         break;
       }
     }
@@ -449,10 +472,26 @@ app.post("/updateWatchlist", function(req, res) {
       });
       req.user.save();
       console.log(req.user);
-      res.send("<h1>Movie Added To Your Watch List</h1>");
+      const h = "Movie Added To Your Watch List";
+      const pm = "";
+      res.render("respond", {
+        h: h,
+        pm: pm,
+        auth: req.authCustom.auth,
+        user: req.user,
+        username: req.authCustom.username
+      });
     }
   } else {
-    res.send("<h1>Hi,You need to login first</h1>");
+    const h = "Hi,You need to login first";
+    const pm = "Click On 'Sign In' Provided In The Navigation Bar Above.";
+    res.render("respond", {
+      h: h,
+      pm: pm,
+      auth: req.authCustom.auth,
+      user: req.user,
+      username: req.authCustom.username
+    });
   }
 });
 
