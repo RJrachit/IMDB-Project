@@ -128,7 +128,7 @@ const autherisationFunc = function(req, res, next) {
      req.authCustom.firstName = req.user.firstName;
      req.authCustom.lastName = req.user.lastName;
    }
-console.log(req.authCustom,req.user);
+   // console.log(req.authCustom,req.user);
   } else {
     req.authCustom.auth = false;
     req.authCustom.username = undefined;
