@@ -185,11 +185,16 @@ app.post('/getUsername', function(req, res) {
     if (!err) {
       if (user.length != 0) {
         console.log(user);
-        res.redirect('/getUsername');
+        res.render('getUsername', {
+          username: "undefined",
+          auth: true,
+          user:{firstName : req.authCustom.firstName,lastName : req.authCustom.lastName},
+          message:"username is already registered"
+        });
       } else {
         req.user.username = username;
         req.user.save();
-        res.redirect('/');
+        res.redirect('/profile');
       }
     }
   })
@@ -199,7 +204,8 @@ app.get('/getUsername', function(req, res) {
   res.render('getUsername', {
     username: "undefined",
     auth: true,
-    user:{firstName : req.authCustom.firstName,lastName : req.authCustom.lastName}
+    user:{firstName : req.authCustom.firstName,lastName : req.authCustom.lastName},
+    message:undefined
   });
 })
 
@@ -223,7 +229,8 @@ app.get("/signup", function(req, res) {
     res.render("signup", {
       username: req.authCustom.username,
       auth: req.authCustom.auth,
-      user: {firstName : req.authCustom.firstName,lastName : req.authCustom.lastName}
+      user: {firstName : req.authCustom.firstName,lastName : req.authCustom.lastName},
+      message:undefined
     });
   }
 
@@ -645,7 +652,12 @@ app.post('/register', function(req, res) {
   }, req.body.password, function(err, user) {
     if (err) {
       console.log(err);
-      res.redirect('/signin');
+      res.render("signup", {
+        username: req.authCustom.username,
+        auth: req.authCustom.auth,
+        user: {firstName : req.authCustom.firstName,lastName : req.authCustom.lastName},
+        message:"username is already registered"
+      });
     } else {
       passport.authenticate("local")(req, res, function() {
         res.redirect('/');

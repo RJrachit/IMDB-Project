@@ -5,8 +5,12 @@ h1, h2, h3, h4, h5, h6 {
 body {
   background: #06000f !important;
   color: #ffcd3c !important;
-}
 
+}
+#page-container{
+  position: relative;
+  min-height: 80vh;
+}
 nav {
   position: fixed;
 }
@@ -23,6 +27,46 @@ input:focus {
 a {
   color: #ffcd3c !important;
   font-size: 1em;
+}
+
+.home-page-intro h1 {
+  transform: rotate(-5deg);
+}
+
+.home-page-intro h2 {
+  display: inline;
+}
+.home-page-intro h3{
+  font-family: 'MuseoModerno', cursive;
+}
+.home-page-intro {
+  margin-top: 10%;
+  font-family: 'MuseoModerno', cursive;
+  transform: scale(1.2);
+  line-height: 1.7;
+}
+
+.home-page-intro span {
+  color: black;
+  border-radius: 10% 15% 20% 10%;
+  background-color: #fcbf1e;
+  font-family: 'MuseoModerno', cursive !important ;
+  line-height: 2;
+}
+.home-page-intro span h2{
+  color: black;
+  border-radius: 10% 15% 20% 10%;
+  background-color: #fcbf1e;
+  font-family: 'MuseoModerno', cursive !important ;
+  line-height: 2;
+}
+
+.carousel-custom div{
+  /* border-radius: 20px; */
+  /* border: 0.1px solid white;
+  border-left: 0px;
+  border-right: 0px;
+  right: 0px; */
 }
 
 #hindi {
