@@ -3,14 +3,18 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 body {
-  background: #06000f !important;
-  color: #ffcd3c !important;
+  background: #06000f ;
+  color: #ffcd3c;
+}
 
-}
-#page-container{
+#page-container {
   position: relative;
-  min-height: 80vh;
+  min-height: 85vh;
+  color: #ffcd3c;
+  background-color: rgb(0,0,0,1);
+  background-image: url("https://www.transparenttextures.com/patterns/gplay.png");
 }
+
 nav {
   position: fixed;
 }
@@ -34,11 +38,17 @@ a {
 }
 
 .home-page-intro h2 {
-  display: inline;
+  display: inline-block;
 }
-.home-page-intro h3{
+
+.home-page-intro {
+  color: black;
+}
+
+.home-page-intro h3 {
   font-family: 'MuseoModerno', cursive;
 }
+
 .home-page-intro {
   margin-top: 10%;
   font-family: 'MuseoModerno', cursive;
@@ -50,23 +60,40 @@ a {
   color: black;
   border-radius: 10% 15% 20% 10%;
   background-color: #fcbf1e;
-  font-family: 'MuseoModerno', cursive !important ;
-  line-height: 2;
-}
-.home-page-intro span h2{
-  color: black;
-  border-radius: 10% 15% 20% 10%;
-  background-color: #fcbf1e;
-  font-family: 'MuseoModerno', cursive !important ;
+  font-family: 'MuseoModerno', cursive !important;
   line-height: 2;
 }
 
-.carousel-custom div{
+.home-page-intro h2 span {
+  transform: rotate(5deg);
+  color: #fcbf1e;
+  border-radius: 10% 15% 20% 10%;
+  background-color: black;
+  font-family: 'MuseoModerno', cursive !important;
+  line-height: 2;
+}
+
+.carousel-custom div {
   /* border-radius: 20px; */
   /* border: 0.1px solid white;
   border-left: 0px;
   border-right: 0px;
   right: 0px; */
+}
+
+.add-texture-1 {
+  background-color: #f2f1e6 !important;
+  background-image: url("/images/textures/concrete-wall.png") !important;
+}
+
+/* .add-texture-2 {
+  background-color: #000000 !important;
+  background-image: url("/images/textures/black-thread-light.png") !important;
+} */
+
+.add-texture-3 {
+  background-color: #000000;
+  background-image: url("/images/textures/gplay.png") !important;
 }
 
 #hindi {

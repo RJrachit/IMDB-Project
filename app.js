@@ -288,7 +288,6 @@ app.get('/search', function(req, res) {
       });
     }
   }
-
 });
 
 app.get("/profile", function(req, res) {
@@ -359,7 +358,6 @@ app.get("/developers", function(req, res) {
   }
 
 });
-
 
 app.get("/show/:id", function(req, res) {
   if (req.isAuthenticated() && !req.user.username) {
@@ -589,7 +587,6 @@ app.post('/deleteComment', function(req, res) {
 });
 
 app.post('/changeSettings', function(req, res) {
-
   if (req.isAuthenticated()) {
     User.findById(req.user._id).then(function(sanitizedUser) {
       if (sanitizedUser) {
@@ -667,7 +664,6 @@ app.post('/register', function(req, res) {
 });
 
 app.post('/login', function(req, res) {
-
   const user = new User({
     username: req.body.username,
     password: req.body.password,
@@ -719,7 +715,6 @@ app.post('/search', function(req, res) {
 });
 
 io.on('connection', (socket) => {
-
   socket.on("new comment", function(newComment) { //adding new comment to database
     console.log(newComment);
     if (newComment.auth == 'false') { //checking if the user is authorised
@@ -744,7 +739,7 @@ io.on('connection', (socket) => {
       })
       comment.save(function(err) {
         if (err) {
-          alert("Oops ! Could not post commnet. Please try again.")
+          alert("Oops ! Could not post comment. Please try again.")
         } else {
           console.log("comment added");
           socket.emit("comment added", {

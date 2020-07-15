@@ -9,9 +9,6 @@
     text-decoration: none !important;
   }
   @media only screen and (max-width: 767px) {
-    .home-page-intro h1 {
-      transform: rotate(-3.7deg);
-    }
     .home-page-intro {
       margin-top: 2% !important;
     }
@@ -24,15 +21,15 @@
 
 
 <!-- Carousel -->
-<div class="row justify-content-center" style="background:white">
-
-
+<div class="row justify-content-center add-texture-1">
   <div class="col-lg-2 col-md-1 col-sm-4 col-2 ">
 
   </div>
+
   <div class="col-lg-3 col-md-4 col-8 home-page-intro">
-    <h1><span>FlickFindrr</span></h1>
-    <h3>Find Your <span class="flick"><h2>Flick</h2></span></h3>
+    <h1 id="home-page-intro-h1"><span>FlickFindrr</span></h1>
+    <h3 style="display: inline;">Find Your </h3>
+    <h2 id="home-page-intro-h2"><span class="flick">Flick</span></h2>
   </div>
 
   <div class="col-lg-7 col-md-7 col-sm-12 col-12 carousel-custom">
@@ -91,7 +88,6 @@
     </div>
   </div>
 </div>
-
 
 <hr>
 <!-- bootstrap grid featured movies-->
@@ -166,7 +162,7 @@
 <hr>
 
 <!-- Trailer and cover -->
-<div class="row pd justify-content-center">
+<div class="row pd justify-content-center" style="background:#050505 !important">
 
   <div class=" col-lg-1 col-sm-1 col-md-1 col-1 icon">
     <button id="featured" type="button" name="button"><i class="fa fa-angle-left" aria-hidden="true"></i></button>
@@ -219,6 +215,8 @@
   });
 </script>
 
+
+<hr>
 
 <!-- bootstrap grid Hindi movies-->
 <h1 align="center">Top <span id="hindi"> बॉलीवुड </span></h1>
@@ -288,8 +286,16 @@
   </div>
 </div>
 
-<hr>
 
+
+<script type="text/javascript">
+  $(document).ready(function(){
+    $("#home-page-intro-h1").css({"transform":"rotate(-365deg)","transition":"transform 2.5s"});
+  })
+  $(document).ready(function(){
+    $("#home-page-intro-h2").css({"transform":"rotate(363deg)","transition":"transform 2.5s"});
+  })
+</script>
 
 
 <%-include("footer.ejs")-%>
