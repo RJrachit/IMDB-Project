@@ -1,4 +1,5 @@
 <%-include("header")-%>
+<hr>
 <style media="screen">
   img.m {
     min-width: 109px;
@@ -9,9 +10,9 @@
     color:black !important;
     border-radius:8px 8px;
   }
-  #page-container{
+  /* #page-container{
     background:white;
-  }
+  } */
 </style>
 <% for(var i=0; i<watchList.length; i++){ %>
 <%const movieTitle = watchList[i].title; %>
@@ -31,7 +32,7 @@
 
     <div class="col-lg-9 col-md-9 col-sm-9 col-8" style="padding:1%;">
       <b>
-        <h5><%= movieTitle %></h5>
+        <h5><b><%= movieTitle %></b></h5>
       </b>
       </a>
       <p> <b>Rating:</b> <%=ratings%></p>
