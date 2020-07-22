@@ -5,6 +5,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
   <title>FlickFindr-r</title>
+
+
   <!-- body-font -->
   <link href="https://fonts.googleapis.com/css2?family=Raleway:wght@100&family=Rowdies:wght@300&display=swap" rel="stylesheet">
 
@@ -69,7 +71,7 @@
   }
 </style>
 
-<body >
+<body>
 
   <!-- Navbar -->
 
@@ -89,23 +91,23 @@
     <div class="collapse navbar-collapse" id="navbarNavDropdown">
       <ul class="navbar-nav ml-auto" style="width:100%;">
         <li class="nav-item active">
-          <a class="nav-link" href="/" style=""><i class="fa fa-home" aria-hidden="true"></i>
-            Home <span class="sr-only">(current)</span></a>
+          <a class="nav-link" href="/"><i class="fa fa-home" aria-hidden="true"></i>
+            Home<span class="sr-only">(current)</span></a>
         </li>
 
         <%if(!auth){%>
         <li class="nav-item active">
-          <a class="nav-link" href="/signin"><i class="far fa-address-book"></i> Sign In</a>
+          <a class="nav-link" href="/signin" ><i class="far fa-address-book"></i> Sign In</a>
         </li>
         <%}%>
 
 
         <li class="nav-item active">
-          <a class="nav-link" href="/seewatchlist"><i class="fas fa-mobile-alt"></i> Watchlist</a>
+          <a class="nav-link" href="/seewatchlist" ><i class="fas fa-mobile-alt"></i> Watchlist</a>
         </li>
         <%if(auth){%>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <a class="nav-link dropdown-toggle" href="#"  id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
             <i class="fas fa-user"></i> My Profile
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
@@ -126,3 +128,4 @@
 
   <hr><hr>
   <div id="page-container">
+    <div class="" style="background:rgb(0,0,0,0.3)">
